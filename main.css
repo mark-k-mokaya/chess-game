@@ -1,0 +1,34 @@
+#chess-board{
+  width: 600px;
+  height: 600px;
+  max-width: 600px;
+  background-color: #0e254d;
+  margin: 0;
+  border: 0;
+  padding: 50px;
+  
+}
+.square{
+    display: inline-block;
+    width: 75px;
+    height: 75px;
+    max-width: 75px; 
+    max-height: 75px;
+    margin: -2px 0; 
+    padding: 0; 
+    border: 0; 
+    background-size: 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.light{
+    background-color: #37548C;
+    color: black;
+}
+
+.dark{
+    background-color: #14356D;
+    color: white;
+}
