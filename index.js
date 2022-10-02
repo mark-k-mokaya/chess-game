@@ -1,41 +1,39 @@
 const pieces = [
     // Black Pieces
-        {name: "rook_1B", pos: "A8", img:"rook-black"},
-        {name: "rook_2B", pos: "H8", img:"rook-black"},
-        {name: "knight_1B", pos: "B8", img:"knight-black"},
-        {name: "knight_2B", pos: "G8", img:"knight-black"},
-        {name: "bishop_1B", pos: "C8", img:"bishop-black"},
-        {name: "bishop_2B", pos: "F8", img:"bishop-black"},
-        {name: "queenB", pos: "D8", img:"queen-black"},
-        {name: "kingB", pos: "E8", img:"king-black"},
-        {name: "pawn_1B", pos: "A7", img:"pawn-black"},
-        {name: "pawn_2B", pos: "B7", img:"pawn-black"},
-        {name: "pawn_3B", pos: "C7", img:"pawn-black"},
-        {name: "pawn_4B", pos: "D7", img:"pawn-black"},
-        {name: "pawn_5B", pos: "E7", img:"pawn-black"},
-        {name: "pawn_6B", pos: "F7", img:"pawn-black"},
-        {name: "pawn_7B", pos: "G7", img:"pawn-black"},
-        {name: "pawn_8B", pos: "H7", img:"pawn-black"},
+        {name: "rook_1B", pos: "a8", img:"rook-black"},
+        {name: "rook_2B", pos: "h8", img:"rook-black"},
+        {name: "knight_1B", pos: "b8", img:"knight-black"},
+        {name: "knight_2B", pos: "g8", img:"knight-black"},
+        {name: "bishop_1B", pos: "c8", img:"bishop-black"},
+        {name: "bishop_2B", pos: "f8", img:"bishop-black"},
+        {name: "queenB", pos: "d8", img:"queen-black"},
+        {name: "kingB", pos: "e8", img:"king-black"},
+        {name: "pawn_1B", pos: "a7", img:"pawn-black"},
+        {name: "pawn_2B", pos: "b7", img:"pawn-black"},
+        {name: "pawn_3B", pos: "c7", img:"pawn-black"},
+        {name: "pawn_4B", pos: "d7", img:"pawn-black"},
+        {name: "pawn_5B", pos: "e7", img:"pawn-black"},
+        {name: "pawn_6B", pos: "f7", img:"pawn-black"},
+        {name: "pawn_7B", pos: "g7", img:"pawn-black"},
+        {name: "pawn_8B", pos: "h7", img:"pawn-black"},
     // white pieces
-        {name: "rook_1W", pos: "A1", img:"rook-white"},
-        {name: "rook_2W", pos: "H1", img:"rook-white"},
-        {name: "knight_1W", pos: "B1", img:"knight-white"},
-        {name: "knight_2W", pos: "G1", img:"knight-white"},
-        {name: "bishop_1W", pos: "C1", img:"bishop-white"},
-        {name: "bishop_2W", pos: "F1", img:"bishop-white"},
-        {name: "queenW", pos: "D1", img:"queen-white"},
-        {name: "kingW", pos: "E1", img:"king-white"},
-        {name: "pawn_1W", pos: "A2", img:"pawn-white"},
-        {name: "pawn_2W", pos: "B2", img:"pawn-white"},
-        {name: "pawn_3W", pos: "C2", img:"pawn-white"},
-        {name: "pawn_4W", pos: "D2", img:"pawn-white"},
-        {name: "pawn_5W", pos: "E2", img:"pawn-white"},
-        {name: "pawn_6W", pos: "F2", img:"pawn-white"},
-        {name: "pawn_7W", pos: "G2", img:"pawn-white"},
-        {name: "pawn_8W", pos: "H2", img:"pawn-white"}
+        {name: "rook_1W", pos: "a1", img:"rook-white"},
+        {name: "rook_2W", pos: "h1", img:"rook-white"},
+        {name: "knight_1W", pos: "b1", img:"knight-white"},
+        {name: "knight_2W", pos: "g1", img:"knight-white"},
+        {name: "bishop_1W", pos: "c1", img:"bishop-white"},
+        {name: "bishop_2W", pos: "f1", img:"bishop-white"},
+        {name: "queenW", pos: "d1", img:"queen-white"},
+        {name: "kingW", pos: "e1", img:"king-white"},
+        {name: "pawn_1W", pos: "a2", img:"pawn-white"},
+        {name: "pawn_2W", pos: "b2", img:"pawn-white"},
+        {name: "pawn_3W", pos: "c2", img:"pawn-white"},
+        {name: "pawn_4W", pos: "d2", img:"pawn-white"},
+        {name: "pawn_5W", pos: "e2", img:"pawn-white"},
+        {name: "pawn_6W", pos: "f2", img:"pawn-white"},
+        {name: "pawn_7W", pos: "g2", img:"pawn-white"},
+        {name: "pawn_8W", pos: "h2", img:"pawn-white"}
 ];
-
-alert("Hello");
 
 function createBoard() {
     // set up chess-board
@@ -87,7 +85,7 @@ function setupPieces(){
         currentSquare.style.backgroundImage = `url('images/chess-pieces/${piece.img}.png')`;
         currentSquare.classList.add(piece.name);
     });
-};
+}
 
 
 // Set up their movements
@@ -131,5 +129,4 @@ function canMove(){
 // Start game
 createBoard();
 setupPieces();
-
 movePiece(pieces.black[10], "d1");
