@@ -35,9 +35,10 @@ const pieces = [
         {name: "pawn_8W", pos: "h2", img:"pawn-white"}
 ];
 
+let board = document.querySelector("#chess-board");
+
 function createBoard() {
     // set up chess-board
-    let board = document.querySelector("#chess-board");
     let boardSquares = [];
 
     for (let i = 1; i <= 64; i++) {
@@ -71,62 +72,125 @@ function createSquare(square) {
     const position = square[0] + square[1];
     newSquare.classList.add("square", square[2]);
     newSquare.setAttribute("id", position);
-    newSquare.addEventListener("click", function (event) {
-        alert(position);
-    });
     return newSquare;
 }
 
 // Setup the pieces on the board
-function setupPieces(){
-    // set up chess pieces
+function setupPieces(isInit){
+     // set up chess pieces
     pieces.forEach((piece)=>{
+        const pieceColor = piece.name[piece.name.length-1];
         let currentSquare = document.getElementById(piece.pos);
         currentSquare.style.backgroundImage = `url('images/chess-pieces/${piece.img}.png')`;
-        currentSquare.classList.add(piece.name);
+        if(isInit){
+            currentSquare.classList.add("init", "occupied", pieceColor);
+        }
+        currentSquare.onclick = ()=>{
+            showMoves(currentSquare, piece);
+        }
     });
 }
 
-
-// Set up their movements
-function movePiece(piece, newPosition){
+// show moves
+function showMoves(currentSquare, piece){
     const pieceName = piece.name.split("_")[0];
-    newPosition = newPosition.toUpperCase();
-    let currentSquare = document.getElementById(piece.pos);
-    let newSquare = document.getElementById(newPosition);
+    const pieceColor = piece.name[piece.name.length-1];
+    const currentPosition = piece.pos;
+    let row = currentPosition[0];
+    let column = parseInt(currentPosition[1]);
+    const moves = [];
+
+    // reset all square-highlighting
+    Array.from(board.children).forEach((square)=>{
+        square.classList.remove('capturable');
+        square.onclick = null;
+        setupPieces(false);
+    });
+
+    switch(pieceName){
+        // Pawns
+        case "pawn":
+            // Move 1 or 2 spaces on the first move
+            if(currentSquare.classList.contains("init") && currentSquare.classList.contains(pieceColor)){
+                let move = row + (pieceColor === "W" ? (column+2): (column-2));
+                checkNotOccupied(move) && moves.push(move);
+            }
+
+            if(column < 8){
+                // Move 1 space on subsequent moves
+                let move = row + (pieceColor === "W" ? (column+1): (column-1));
+                checkNotOccupied(move) ? moves.push(move): moves=[];
+            }else if (column==8){
+                // promote pawn
+            }
+            break;
+        default:
+            alert("Not a pawn!");
+            break;
+    }
+    
+
+    // Highlight capturable squares
+    highlightSquares(moves, piece, currentSquare);
+
+    // Listen for click on current square to toggle highlighted squares
+    currentSquare.onclick = ()=>highlightSquares(moves, piece, currentSquare);
+}
+
+function highlightSquares(moves, piece, currentSquare) {
+    moves.forEach(position=>{
+        let newSquare = document.getElementById(position);
+        newSquare.classList.toggle("capturable");
+
+        if(newSquare.onclick === null){
+            newSquare.onclick = ()=>{
+                movePiece(piece, position, moves, currentSquare);
+            };
+        }else{
+            newSquare.onclick = null;
+        }
+        
+    });
+}
+
+function checkNotOccupied(position){
+    let square = document.getElementById(position);
+    return !square.classList.contains("occupied");
+}
+
+// move piece
+function movePiece(piece, newPosition, moves, currentSquare){
+    // deselect other squares  
+    moves.forEach((position)=>{
+        let newSquare = document.getElementById(position);
+        newSquare.classList.remove('capturable');
+        newSquare.onclick = null;
+    });
+
+    // fetch current square
+    // remove any init class since the square is not unused
+    // remove any occupied class since the piece is leaving the square
+    // remove image and event listener
+    currentSquare.classList.remove("init", "occupied", "B", "W");
     currentSquare.style.backgroundImage = null;
+    currentSquare.onclick = null;
+
+    // Fetch new square
+    let newSquare = document.getElementById(newPosition);
+    newSquare.classList.add("occupied");
+
+    // update position of piece in pieces array
     piece.pos = newPosition;
-    newSquare.classList.add(piece.name);
-    newSquare.style.backgroundImage = `url('images/chess-pieces/${piece.img}.png')`;
+
+    // switch to other player
+    setupPieces(false);
 }
 
-function canMove(){
-    // switch (pieceName) {
-    //     case "rook":
-            
-    //     case "knight":
-    //         alert("I'm a knight!");
-    //         break;
-    //     case "bishop":
-    //         alert("I'm a bishop!");
-    //         break;
-    //     case "queen":
-    //         alert("I'm a queen!");
-    //         break;
-    //     case "king":
-    //         alert("I'm a king!");
-    //         break;
-    //     case "pawn":
-    //         alert("I'm a queen!");
-    //         break;
-    //     default:
-    //         alert("I'm an empty square!");
-    //         break;
-    // }
+function takePiece() {
+                // en passe
+            // TBD
 }
-
 
 // Start game
 createBoard();
-setupPieces();
-movePiece(pieces.black[10], "d1");
+setupPieces(true);
