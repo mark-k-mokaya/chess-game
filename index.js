@@ -41,8 +41,9 @@ function createBoard() {
     // set up chess-board
     let boardSquares = [];
 
+    // could have nested for loops, all we're doing is getting the values
     for (let i = 1; i <= 64; i++) {
-        // set up rows and columns
+        // set up columns and rows
         let row = Math.floor((64 - i) / 8) + 1;
         let column = i - (8 * (8 - row));
 
@@ -96,33 +97,123 @@ function showMoves(currentSquare, piece){
     const pieceName = piece.name.split("_")[0];
     const pieceColor = piece.name[piece.name.length-1];
     const currentPosition = piece.pos;
-    let row = currentPosition[0];
-    let column = parseInt(currentPosition[1]);
-    const moves = [];
+    let columnLetter= currentPosition[0];
+    let column = parseInt(columnLetter, 36);
+    let row = parseInt(currentPosition[1]);
+    let moves = [];
+    let attackMoves = [];
 
     // reset all square-highlighting
     Array.from(board.children).forEach((square)=>{
-        square.classList.remove('capturable');
+        square.classList.remove('capturable', 'attackable');
         square.onclick = null;
         setupPieces(false);
     });
+
+    // bounds object with rows:[], columns:[]
+    // test if bounds.rows includes new value
 
     switch(pieceName){
         // Pawns
         case "pawn":
             // Move 1 or 2 spaces on the first move
             if(currentSquare.classList.contains("init") && currentSquare.classList.contains(pieceColor)){
-                let move = row + (pieceColor === "W" ? (column+2): (column-2));
-                checkNotOccupied(move) && moves.push(move);
+                let move = columnLetter + (pieceColor === "W" ? (row+2): (row-2));
+                checkCanCaptureSquare(move) && moves.push(move);
             }
 
-            if(column < 8){
+            if(row < 8){
                 // Move 1 space on subsequent moves
-                let move = row + (pieceColor === "W" ? (column+1): (column-1));
-                checkNotOccupied(move) ? moves.push(move): moves=[];
-            }else if (column==8){
-                // promote pawn
+                let move = columnLetter + (pieceColor === "W" ? (row+1): (row-1));
+                checkCanCaptureSquare(move) ? moves.push(move): moves=[];
+
+                // check attack and en passe
+
+                // right diagonal
+                move = (column+1).toString(36) + (pieceColor === "W" ? (row+1): (row-1));
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // left diagonal
+                move = (column-1).toString(36) + (pieceColor === "W" ? (row+1): (row-1));
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }           
+
+            break;
+        case "bishop":
+            // move diagonally
+            let canMoveRightUpDiag = canMoveLeftUpDiag = canMoveLeftDownDiag = canMoveRightDownDiag = true;
+
+            // loop and find possible moves
+            for (let i = 1; i < 8; i++) {
+                // move right-diagonal-up
+                if (row+i<9 && column+i<18 & canMoveRightUpDiag){
+                    let move = (column+i).toString(36) + (row+i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightUpDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move left-diagonal-up
+                if (row+i<9 && column-i>9 && canMoveLeftUpDiag){
+                    let move = (column-i).toString(36) + (row+i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftUpDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move left-diagonal-down
+                if (row-i>0 && column-i>9 && canMoveLeftDownDiag){
+                    let move = (column-i).toString(36) + (row-i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftDownDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                } 
+                
+                // move-right-diagonal-down
+                if (row-i>0 && column+i<18 && canMoveRightDownDiag){
+                    let move = (column+i).toString(36) + (row-i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightDownDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
             }
+            break;
+        case "knight":
+                // move 1 right & 2 forward 
+                let move = (column+1).toString(36) + (row+2);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 1 left & 2 forward
+                move = (column-1).toString(36) + (row+2);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 1 right & 2 backward
+                move = (column+1).toString(36) + (row-2);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 1 left & 2 backward
+                move = (column-1).toString(36) + (row-2);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 2 right & 1 forward
+                move = (column+2).toString(36) + (row+1);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 2 right & 1 backward
+                move = (column+2).toString(36) + (row-1);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 2 left & 1 forward
+                move = (column-2).toString(36) + (row+1);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+
+                // move 2 left & 1 backward
+                move = (column-2).toString(36) + (row-1);
+                checkCanCaptureSquare(move) && moves.push(move);
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
             break;
         default:
             alert("Not a pawn!");
@@ -131,41 +222,72 @@ function showMoves(currentSquare, piece){
     
 
     // Highlight capturable squares
-    highlightSquares(moves, piece, currentSquare);
+    highlightSquares(moves, attackMoves, piece, currentSquare);
 
     // Listen for click on current square to toggle highlighted squares
-    currentSquare.onclick = ()=>highlightSquares(moves, piece, currentSquare);
+    currentSquare.onclick = ()=>highlightSquares(moves, attackMoves, piece, currentSquare);
 }
 
-function highlightSquares(moves, piece, currentSquare) {
-    moves.forEach(position=>{
-        let newSquare = document.getElementById(position);
-        newSquare.classList.toggle("capturable");
+function highlightSquares(moves, attackMoves, piece, currentSquare) {
+    let totalMoves = moves.concat(attackMoves);
 
-        if(newSquare.onclick === null){
-            newSquare.onclick = ()=>{
-                movePiece(piece, position, moves, currentSquare);
-            };
+    for (let i = 0; i < totalMoves.length; i++) {
+        let position = totalMoves[i];
+        if(i<moves.length){
+            let newSquare = document.getElementById(position);
+            newSquare.classList.toggle("capturable");
+
+            if(newSquare.onclick === null){
+                newSquare.onclick = ()=>{
+                    movePiece(piece, position, moves, attackMoves, currentSquare);
+                };
+            }else{
+                setupPieces(false);
+            }
         }else{
-            newSquare.onclick = null;
+            let newSquare = document.getElementById(position);
+            newSquare.classList.toggle("attackable");
+            if(newSquare.classList.contains("attackable")){
+                newSquare.onclick = ()=>{
+                    takePiece(piece, position, moves, attackMoves, currentSquare);
+                };
+            }else {
+                setupPieces(false);
+            }
         }
         
-    });
+    }
 }
 
-function checkNotOccupied(position){
+function checkCanCaptureSquare(position){
     let square = document.getElementById(position);
-    return !square.classList.contains("occupied");
+    // check if out of bounds
+    if(square != null){
+        return !square.classList.contains("occupied");
+    }
+    return false;
+}
+
+function checkCanAttack(position, pieceColor){
+    let square = document.getElementById(position);
+    // check if out of bounds
+    if(square != null){
+        return square.classList.contains("occupied") && !square.classList.contains(pieceColor);
+    }
+    return false;
 }
 
 // move piece
-function movePiece(piece, newPosition, moves, currentSquare){
-    // deselect other squares  
-    moves.forEach((position)=>{
-        let newSquare = document.getElementById(position);
-        newSquare.classList.remove('capturable');
-        newSquare.onclick = null;
-    });
+function movePiece(piece, newPosition, moves, attackMoves, currentSquare){
+    // deselect other squares 
+    let totalMoves = moves.concat(attackMoves);
+
+    for (let i = 0; i < totalMoves.length; i++) {
+        let position = totalMoves[i];
+            let newSquare = document.getElementById(position);
+            newSquare.classList.remove('capturable', "attackable");
+            newSquare.onclick = null;
+    }
 
     // fetch current square
     // remove any init class since the square is not unused
@@ -177,20 +299,36 @@ function movePiece(piece, newPosition, moves, currentSquare){
 
     // Fetch new square
     let newSquare = document.getElementById(newPosition);
-    newSquare.classList.add("occupied");
+    const pieceName = piece.name.split("_")[0];
+    const pieceColor = piece.name[piece.name.length-1];
+    newSquare.classList.add("occupied", pieceColor);
 
     // update position of piece in pieces array
     piece.pos = newPosition;
+
+    // promote pawn using piece name and color and if new row == 8 or row == 1
 
     // switch to other player
     setupPieces(false);
 }
 
-function takePiece() {
-                // en passe
-            // TBD
+function takePiece(currentPiece, newPosition, moves, attackMoves, currentSquare) {
+    let opponent = pieces.indexOf(pieces.find(piece=>{
+        return piece.pos == newPosition;
+    }));
+
+    // remove opponent piece
+    let capturedSquare = document.getElementById(newPosition);
+    capturedSquare.classList.remove("init", "occupied", "B", "W");
+    pieces.splice(opponent, 1);
+
+    movePiece(currentPiece, newPosition, moves, attackMoves, currentSquare);
 }
 
 // Start game
 createBoard();
 setupPieces(true);
+// startGame();
+// playerTurn = "white";
+// movePiece to toggle playerTurn between "black" and "white"
+// showMoves can check if piece color == playerTurn
