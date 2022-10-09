@@ -6,8 +6,8 @@ const pieces = [
         {name: "knight_2B", pos: "g8", img:"knight-black"},
         {name: "bishop_1B", pos: "c8", img:"bishop-black"},
         {name: "bishop_2B", pos: "f8", img:"bishop-black"},
-        {name: "queenB", pos: "d8", img:"queen-black"},
-        {name: "kingB", pos: "e8", img:"king-black"},
+        {name: "queen_B", pos: "d8", img:"queen-black"},
+        {name: "king_B", pos: "e8", img:"king-black"},
         {name: "pawn_1B", pos: "a7", img:"pawn-black"},
         {name: "pawn_2B", pos: "b7", img:"pawn-black"},
         {name: "pawn_3B", pos: "c7", img:"pawn-black"},
@@ -23,8 +23,8 @@ const pieces = [
         {name: "knight_2W", pos: "g1", img:"knight-white"},
         {name: "bishop_1W", pos: "c1", img:"bishop-white"},
         {name: "bishop_2W", pos: "f1", img:"bishop-white"},
-        {name: "queenW", pos: "d1", img:"queen-white"},
-        {name: "kingW", pos: "e1", img:"king-white"},
+        {name: "queen_W", pos: "d1", img:"queen-white"},
+        {name: "king_W", pos: "e1", img:"king-white"},
         {name: "pawn_1W", pos: "a2", img:"pawn-white"},
         {name: "pawn_2W", pos: "b2", img:"pawn-white"},
         {name: "pawn_3W", pos: "c2", img:"pawn-white"},
@@ -103,15 +103,14 @@ function showMoves(currentSquare, piece){
     let moves = [];
     let attackMoves = [];
 
+    let canMoveUp = canMoveDown = canMoveLeft = canMoveRight = canMoveRightUpDiag = canMoveLeftUpDiag = canMoveLeftDownDiag = canMoveRightDownDiag = true;
+
     // reset all square-highlighting
     Array.from(board.children).forEach((square)=>{
         square.classList.remove('capturable', 'attackable');
         square.onclick = null;
         setupPieces(false);
     });
-
-    // bounds object with rows:[], columns:[]
-    // test if bounds.rows includes new value
 
     switch(pieceName){
         // Pawns
@@ -141,33 +140,33 @@ function showMoves(currentSquare, piece){
             break;
         case "bishop":
             // move diagonally
-            let canMoveRightUpDiag = canMoveLeftUpDiag = canMoveLeftDownDiag = canMoveRightDownDiag = true;
+            canMoveRightUpDiag = canMoveLeftUpDiag = canMoveLeftDownDiag = canMoveRightDownDiag = true;
 
             // loop and find possible moves
             for (let i = 1; i < 8; i++) {
                 // move right-diagonal-up
-                if (row+i<9 && column+i<18 & canMoveRightUpDiag){
+                if (canMoveRightUpDiag){
                     let move = (column+i).toString(36) + (row+i);
                     checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightUpDiag = false;
                     checkCanAttack(move, pieceColor) && attackMoves.push(move);
                 }
 
                 // move left-diagonal-up
-                if (row+i<9 && column-i>9 && canMoveLeftUpDiag){
+                if (canMoveLeftUpDiag){
                     let move = (column-i).toString(36) + (row+i);
                     checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftUpDiag = false;
                     checkCanAttack(move, pieceColor) && attackMoves.push(move);
                 }
 
                 // move left-diagonal-down
-                if (row-i>0 && column-i>9 && canMoveLeftDownDiag){
+                if (canMoveLeftDownDiag){
                     let move = (column-i).toString(36) + (row-i);
                     checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftDownDiag = false;
                     checkCanAttack(move, pieceColor) && attackMoves.push(move);
                 } 
                 
                 // move-right-diagonal-down
-                if (row-i>0 && column+i<18 && canMoveRightDownDiag){
+                if (canMoveRightDownDiag){
                     let move = (column+i).toString(36) + (row-i);
                     checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightDownDiag = false;
                     checkCanAttack(move, pieceColor) && attackMoves.push(move);
@@ -215,8 +214,163 @@ function showMoves(currentSquare, piece){
                 checkCanCaptureSquare(move) && moves.push(move);
                 checkCanAttack(move, pieceColor) && attackMoves.push(move);
             break;
-        default:
-            alert("Not a pawn!");
+        case "rook":
+            canMoveUp = canMoveDown = canMoveLeft = canMoveRight = true;
+
+            for (let i = 1; i < 8; i++) {
+                // move up
+                if (canMoveUp){
+                    let move = (column).toString(36) + (row+i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveUp = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move down
+                if (canMoveDown){
+                    let move = (column).toString(36) + (row-i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveDown = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move right
+                if (canMoveRight){
+                    let move = (column+i).toString(36) + (row);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveRight = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move left
+                if (canMoveLeft){
+                    let move = (column-i).toString(36) + (row);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeft = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+            }
+            break;
+        case "queen":
+            canMoveUp = canMoveDown = canMoveLeft = canMoveRight = canMoveRightUpDiag = canMoveLeftUpDiag = canMoveLeftDownDiag = canMoveRightDownDiag = true;
+            
+            for (let i = 1; i < 8; i++) {
+                // move up
+                if (canMoveUp){
+                    let move = (column).toString(36) + (row+i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveUp = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move down
+                if (canMoveDown){
+                    let move = (column).toString(36) + (row-i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveDown = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move right
+                if (canMoveRight){
+                    let move = (column+i).toString(36) + (row);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveRight = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move left
+                if (canMoveLeft){
+                    let move = (column-i).toString(36) + (row);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeft = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move right-diagonal-up
+                if (canMoveRightUpDiag){
+                    let move = (column+i).toString(36) + (row+i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightUpDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move left-diagonal-up
+                if (canMoveLeftUpDiag){
+                    let move = (column-i).toString(36) + (row+i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftUpDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+                // move left-diagonal-down
+                if (canMoveLeftDownDiag){
+                    let move = (column-i).toString(36) + (row-i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftDownDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                } 
+                
+                // move-right-diagonal-down
+                if (canMoveRightDownDiag){
+                    let move = (column+i).toString(36) + (row-i);
+                    checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightDownDiag = false;
+                    checkCanAttack(move, pieceColor) && attackMoves.push(move);
+                }
+
+            }
+            break;
+        case "king":
+            canMoveUp = canMoveDown = canMoveLeft = canMoveRight = canMoveRightUpDiag = canMoveLeftUpDiag = canMoveLeftDownDiag = canMoveRightDownDiag = true;
+
+            // move up
+            if (canMoveUp){
+                let move = (column).toString(36) + (row+1);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveUp = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+
+            // move down
+            if (canMoveDown){
+                let move = (column).toString(36) + (row-1);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveDown = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+
+            // move right
+            if (canMoveRight){
+                let move = (column+1).toString(36) + (row);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveRight = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+
+            // move left
+            if (canMoveLeft){
+                let move = (column-1).toString(36) + (row);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeft = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+
+            // move right-diagonal-up
+            if (canMoveRightUpDiag){
+                let move = (column+1).toString(36) + (row+1);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightUpDiag = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+
+            // move left-diagonal-up
+            if (canMoveLeftUpDiag){
+                let move = (column-1).toString(36) + (row+1);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftUpDiag = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+
+            // move left-diagonal-down
+            if (canMoveLeftDownDiag){
+                let move = (column-1).toString(36) + (row-1);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveLeftDownDiag = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            } 
+            
+            // move-right-diagonal-down
+            if (canMoveRightDownDiag){
+                let move = (column+1).toString(36) + (row-1);
+                checkCanCaptureSquare(move) ? moves.push(move) : canMoveRightDownDiag = false;
+                checkCanAttack(move, pieceColor) && attackMoves.push(move);
+            }
+            break;
+            default:
+            alert("An unexpected error has occurred!");
             break;
     }
     
