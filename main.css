@@ -1,20 +1,22 @@
+*{
+    box-sizing: border-box;
+}
+
 #chess-board{
-  width: 600px;
-  height: 600px;
-  max-width: 600px;
-  background-color: #0e254d;
-  margin: 0;
-  border: 0;
-  padding: 50px;
+    width: 700px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    background-color: #071d42;
+    margin: 0 auto;
+    border: 0;
+    padding: 50px;
   
 }
 .square{
     display: inline-block;
     width: 75px;
     height: 75px;
-    max-width: 75px; 
-    max-height: 75px;
-    margin: -2px 0; 
+    margin: 0; 
     padding: 0; 
     border: 0; 
     background-size: 90%;
@@ -24,12 +26,12 @@
 }
 
 .light{
-    background-color: #37548C;
+    background-color: #305090;
     color: black;
 }
 
 .dark{
-    background-color: #14356D;
+    background-color: #10336f;
     color: white;
 }
 
@@ -39,4 +41,8 @@
 
 .attackable{
     background-color: #e74c3c;
+}
+
+.capturable:hover, .attackable:hover{
+    border: 10px solid #000;
 }
